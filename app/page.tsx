@@ -120,7 +120,7 @@ export default async function Home() {
       )}
 
       <footer className="text-center text-white/40 text-[11px] font-pixel leading-loose pt-4 pb-2">
-        DRINK RESPONSIBLY · BEER WITHIN 3 LAPS · GG WP
+        DRINK TILL YOU DIE · BEER WITHIN 3 LAPS · GG WP
       </footer>
     </main>
   );

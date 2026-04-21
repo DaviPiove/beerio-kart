@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Heat, HeatPlayer, Player } from "@/lib/types";
 import { HeatResultsForm } from "./results-form";
+import { Beer, CheckerFlag } from "@/components/assets";
 
 export const dynamic = "force-dynamic";
 
@@ -44,20 +45,38 @@ export default async function HeatPage({
     .filter((r) => r.player);
 
   return (
-    <main className="mx-auto w-full max-w-xl px-4 py-8 flex-1 flex flex-col gap-6">
-      <Link href={`/t/${id}`} className="text-sm text-white/60 hover:text-white/90">
-        ← Back to bracket
+    <main className="mx-auto w-full max-w-xl px-4 py-6 sm:py-8 flex-1 flex flex-col gap-6">
+      <Link
+        href={`/t/${id}`}
+        className="inline-flex items-center gap-2 text-xs font-pixel text-white/70 hover:text-banana transition"
+      >
+        ← BRACKET
       </Link>
 
-      <header>
-        <h1 className="mk-title text-3xl sm:text-4xl">
-          Round {h.round} · Heat {h.heat_number}
+      <header className="relative anim-pop">
+        <div
+          className="absolute -top-4 -right-2 w-16 anim-bob opacity-80"
+          aria-hidden
+        >
+          <CheckerFlag />
+        </div>
+        <div className="flex items-center gap-3 mb-2">
+          <span className="font-pixel text-[10px] px-2.5 py-1.5 rounded-full border-2 border-[#1a0030] bg-sky text-[#002a4a] shadow-[0_3px_0_#1a0030]">
+            ROUND {h.round}
+          </span>
+          <span className="font-pixel text-[10px] px-2.5 py-1.5 rounded-full border-2 border-[#1a0030] bg-peach text-white shadow-[0_3px_0_#1a0030]">
+            HEAT {h.heat_number}
+          </span>
+        </div>
+        <h1 className="headline-sm text-3xl sm:text-4xl">
+          {h.status === "done" ? "Results" : "Tap the finish order"}
         </h1>
-        <p className="text-white/60 mt-1">
-          {h.status === "done"
-            ? "Results locked in."
-            : `Tap each racer in finishing order (1st → ${roster.length}${roster.length === 1 ? "st" : roster.length === 2 ? "nd" : roster.length === 3 ? "rd" : "th"}). 🍺 chug within 3 laps!`}
-        </p>
+        {h.status !== "done" && (
+          <p className="text-white/70 mt-2 flex items-start gap-2">
+            <span className="w-5 h-5 shrink-0 mt-0.5"><Beer /></span>
+            Chug within 3 laps. No joystick while drinking. 1st → last.
+          </p>
+        )}
       </header>
 
       <HeatResultsForm

@@ -315,6 +315,17 @@ async function maybeAdvanceRound(tournamentId: string, round: number) {
     .eq("id", tournamentId);
 }
 
+export async function deleteTournament(tournamentId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("tournaments")
+    .delete()
+    .eq("id", tournamentId);
+  if (error) throw error;
+  revalidatePath("/");
+  redirect("/");
+}
+
 export async function resetTournament(tournamentId: string) {
   const supabase = await createClient();
   // Wipe heats (cascades to heat_players). Un-eliminate players.

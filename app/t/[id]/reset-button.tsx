@@ -6,9 +6,9 @@ import { resetTournament } from "@/app/actions";
 export function ResetButton({ tournamentId }: { tournamentId: string }) {
   const [pending, startTransition] = useTransition();
   return (
-    <div className="text-center">
+    <div className="text-center pt-4">
       <button
-        className="mk-btn mk-btn-ghost text-sm"
+        className="btn btn-ghost btn-sm"
         disabled={pending}
         onClick={() => {
           if (!confirm("Reset the tournament? Bracket will be wiped."))
@@ -18,7 +18,7 @@ export function ResetButton({ tournamentId }: { tournamentId: string }) {
           });
         }}
       >
-        {pending ? "Resetting…" : "↺ Reset tournament"}
+        {pending ? "Resetting…" : "↺ Reset bracket"}
       </button>
     </div>
   );

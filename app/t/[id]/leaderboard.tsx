@@ -13,38 +13,46 @@ export function Leaderboard({
     .sort((a, b) => (b.eliminated_round ?? 0) - (a.eliminated_round ?? 0));
   const winner = winnerId ? players.find((p) => p.id === winnerId) : null;
 
+  if (players.length === 0) return null;
+
   return (
-    <section className="mk-card p-6">
-      <h2 className="text-xl font-bold mb-4">📊 Leaderboard</h2>
-      <ul className="flex flex-col gap-1.5">
+    <section className="card p-5 sm:p-7">
+      <h2 className="font-display uppercase text-xl sm:text-2xl mb-5 flex items-center gap-3">
+        📊 Leaderboard
+      </h2>
+      <ul className="flex flex-col gap-2">
         {winner && (
-          <li className="flex items-center gap-3 py-2 px-3 rounded-lg bg-mk-yellow/15 border border-mk-yellow/30">
+          <li className="flex items-center gap-3 py-2.5 px-4 rounded-2xl bg-gradient-to-r from-banana to-shell border-2 border-[#1a0030] shadow-[0_4px_0_#1a0030]">
             <span className="text-2xl">🏆</span>
-            <span className="font-black text-mk-yellow">{winner.name}</span>
-            <span className="text-xs ml-auto uppercase tracking-wider text-mk-yellow/80">
-              Winner
+            <span className="font-display uppercase text-[#3a1600] flex-1">
+              {winner.name}
+            </span>
+            <span className="font-pixel text-[10px] text-[#3a1600]/80">
+              WINNER
             </span>
           </li>
         )}
         {alive.map((p) => (
           <li
             key={p.id}
-            className="flex items-center gap-3 py-2 px-3 rounded-lg bg-white/5"
+            className="flex items-center gap-3 py-2 px-4 rounded-xl bg-white/5 border border-white/10"
           >
             <span>🏎️</span>
-            <span className="font-semibold">{p.name}</span>
-            <span className="text-xs ml-auto text-white/50">Alive</span>
+            <span className="font-semibold flex-1">{p.name}</span>
+            <span className="tag bg-luigi text-[#0a2e17] text-[10px]">
+              Alive
+            </span>
           </li>
         ))}
         {eliminated.map((p) => (
           <li
             key={p.id}
-            className="flex items-center gap-3 py-2 px-3 rounded-lg opacity-50"
+            className="flex items-center gap-3 py-2 px-4 rounded-xl opacity-55"
           >
             <span>💀</span>
-            <span className="line-through">{p.name}</span>
-            <span className="text-xs ml-auto">
-              Out R{p.eliminated_round}
+            <span className="line-through flex-1">{p.name}</span>
+            <span className="font-pixel text-[10px] text-white/60">
+              OUT R{p.eliminated_round}
             </span>
           </li>
         ))}

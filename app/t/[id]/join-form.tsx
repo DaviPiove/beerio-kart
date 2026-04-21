@@ -15,8 +15,9 @@ export function JoinForm({ tournamentId }: { tournamentId: string }) {
         startTransition(async () => {
           try {
             await joinTournament(tournamentId, fd);
-            (document.getElementById("join-input") as HTMLInputElement | null)?.setAttribute("value", "");
-            const input = document.getElementById("join-input") as HTMLInputElement | null;
+            const input = document.getElementById(
+              "join-input",
+            ) as HTMLInputElement | null;
             if (input) input.value = "";
           } catch (e) {
             setError(e instanceof Error ? e.message : "Something went wrong");
@@ -30,18 +31,18 @@ export function JoinForm({ tournamentId }: { tournamentId: string }) {
         placeholder="Your racer name"
         required
         maxLength={24}
-        className="mk-input flex-1"
+        className="input flex-1"
         disabled={pending}
       />
       <button
         type="submit"
-        className="mk-btn mk-btn-primary"
+        className="btn btn-green btn-wiggle"
         disabled={pending}
       >
         {pending ? "Joining…" : "Join 🏁"}
       </button>
       {error && (
-        <div className="w-full text-sm text-red-300">{error}</div>
+        <div className="w-full text-sm text-[#ffcccc] font-bold">⚠ {error}</div>
       )}
     </form>
   );

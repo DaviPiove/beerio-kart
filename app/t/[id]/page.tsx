@@ -8,6 +8,9 @@ import { Bracket } from "./bracket";
 import { Leaderboard } from "./leaderboard";
 import { RealtimeRefresher } from "./realtime";
 import { ResetButton } from "./reset-button";
+import { WinnerCelebration } from "./winner-celebration";
+import { DeleteTournamentButton } from "@/components/delete-tournament-button";
+import { Kart, Mushroom } from "@/components/assets";
 
 export const dynamic = "force-dynamic";
 
@@ -19,25 +22,31 @@ export default async function TournamentPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: tournament }, { data: players }, { data: heats }, { data: heatPlayers }] =
-    await Promise.all([
-      supabase.from("tournaments").select("*").eq("id", id).single(),
-      supabase
-        .from("players")
-        .select("*")
-        .eq("tournament_id", id)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("heats")
-        .select("*")
-        .eq("tournament_id", id)
-        .order("round", { ascending: true })
-        .order("heat_number", { ascending: true }),
-      supabase
-        .from("heat_players")
-        .select("heat_id, player_id, finish_position, is_bye, heats!inner(tournament_id)")
-        .eq("heats.tournament_id", id),
-    ]);
+  const [
+    { data: tournament },
+    { data: players },
+    { data: heats },
+    { data: heatPlayers },
+  ] = await Promise.all([
+    supabase.from("tournaments").select("*").eq("id", id).single(),
+    supabase
+      .from("players")
+      .select("*")
+      .eq("tournament_id", id)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("heats")
+      .select("*")
+      .eq("tournament_id", id)
+      .order("round", { ascending: true })
+      .order("heat_number", { ascending: true }),
+    supabase
+      .from("heat_players")
+      .select(
+        "heat_id, player_id, finish_position, is_bye, heats!inner(tournament_id)",
+      )
+      .eq("heats.tournament_id", id),
+  ]);
 
   if (!tournament) return notFound();
   const t = tournament as Tournament;
@@ -47,66 +56,114 @@ export default async function TournamentPage({
   const winner = t.winner_id ? ps.find((p) => p.id === t.winner_id) : null;
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 flex-1 flex flex-col gap-8">
+    <main className="mx-auto w-full max-w-4xl px-4 py-6 sm:py-8 flex-1 flex flex-col gap-6 sm:gap-8">
       <RealtimeRefresher tournamentId={t.id} />
-      <header className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
+      {t.status === "finished" && winner && (
+        <WinnerCelebration key={winner.id} />
+      )}
+
+      <header className="flex items-start justify-between gap-4 anim-pop">
+        <div className="flex-1 min-w-0">
           <Link
             href="/"
-            className="text-sm text-white/60 hover:text-white/90"
+            className="inline-flex items-center gap-2 text-xs font-pixel text-white/70 hover:text-banana transition"
           >
-            ← Home
+            ← HOME
           </Link>
-          <h1 className="mk-title text-4xl sm:text-5xl mt-1">{t.name}</h1>
-          <p className="text-white/60 mt-1 text-sm">
-            {t.status === "lobby" && `Lobby — ${ps.length} player${ps.length === 1 ? "" : "s"} joined`}
-            {t.status === "active" && `🏁 Round ${t.current_round} in progress`}
-            {t.status === "finished" && winner && `🏆 Winner: ${winner.name}`}
-          </p>
+          <h1 className="headline-sm text-3xl sm:text-5xl mt-2 break-words">
+            {t.name}
+          </h1>
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            {t.status === "lobby" && (
+              <span className="tag bg-luigi text-[#0a2e17]">
+                🕹 Lobby · {ps.length} {ps.length === 1 ? "racer" : "racers"}
+              </span>
+            )}
+            {t.status === "active" && (
+              <span className="tag bg-mario text-white animate-pulse">
+                🔥 Round {t.current_round} Live
+              </span>
+            )}
+            {t.status === "finished" && winner && (
+              <span className="tag bg-banana text-[#3a1600]">
+                🏆 {winner.name} wins!
+              </span>
+            )}
+          </div>
         </div>
+        <DeleteTournamentButton
+          tournamentId={t.id}
+          tournamentName={t.name}
+        />
       </header>
 
       {t.status === "finished" && winner && (
-        <section className="mk-card p-8 text-center">
-          <div className="text-7xl mb-3">🏆🍺</div>
-          <div className="mk-title text-3xl">{winner.name}</div>
-          <p className="text-white/60 mt-2">drank the beers and won it all.</p>
+        <section className="card-sticker bg-gradient-to-b from-banana to-shell text-center p-6 sm:p-10 anim-pop anim-pop-1 relative overflow-hidden">
+          <div className="absolute -left-6 top-6 w-20 opacity-80 -rotate-12" aria-hidden>
+            <Mushroom />
+          </div>
+          <div className="absolute -right-4 bottom-2 w-20 opacity-80 rotate-12" aria-hidden>
+            <Kart />
+          </div>
+          <div className="text-6xl mb-2">🏆🍺</div>
+          <div className="font-display uppercase text-4xl sm:text-5xl text-[#3a1600]" style={{ WebkitTextStroke: "2px #fff" }}>
+            {winner.name}
+          </div>
+          <p className="text-[#3a1600]/90 mt-3 font-bold">
+            drank the beers and won it all.
+          </p>
         </section>
       )}
 
       {t.status === "lobby" && (
         <>
-          <section className="mk-card p-6">
-            <h2 className="text-xl font-bold mb-4">🎮 Join the tournament</h2>
+          <section className="card p-6 sm:p-8 anim-pop anim-pop-1">
+            <h2 className="font-display uppercase text-xl sm:text-2xl mb-1 text-banana">
+              🎮 Join the race
+            </h2>
+            <p className="text-white/60 text-sm mb-5">
+              Type your racer name and jump into the lobby.
+            </p>
             <JoinForm tournamentId={t.id} />
             <ul className="mt-6 flex flex-wrap gap-2">
-              {ps.map((p) => (
+              {ps.map((p, i) => (
                 <li
                   key={p.id}
-                  className="px-3 py-1.5 rounded-full bg-white/10 text-sm font-medium"
+                  className="anim-pop"
+                  style={{ animationDelay: `${i * 0.04}s` }}
                 >
-                  🏎️ {p.name}
+                  <span className="tag bg-white text-[#1a0030]">
+                    🏎️ {p.name}
+                  </span>
                 </li>
               ))}
               {ps.length === 0 && (
-                <li className="text-white/50 text-sm">No racers yet.</li>
+                <li className="text-white/50 text-sm italic">
+                  No racers yet. Be the first.
+                </li>
               )}
             </ul>
           </section>
-          <LobbyActions tournamentId={t.id} playerCount={ps.length} />
+          <div className="anim-pop anim-pop-2">
+            <LobbyActions tournamentId={t.id} playerCount={ps.length} />
+          </div>
         </>
       )}
 
       {(t.status === "active" || t.status === "finished") && (
-        <Bracket
-          tournamentId={t.id}
-          heats={hs}
-          heatPlayers={hps}
-          players={ps}
-        />
+        <div className="anim-pop anim-pop-1">
+          <Bracket
+            tournamentId={t.id}
+            heats={hs}
+            heatPlayers={hps}
+            players={ps}
+          />
+        </div>
       )}
 
-      <Leaderboard players={ps} winnerId={t.winner_id} />
+      <div className="anim-pop anim-pop-2">
+        <Leaderboard players={ps} winnerId={t.winner_id} />
+      </div>
 
       {t.status !== "lobby" && <ResetButton tournamentId={t.id} />}
     </main>

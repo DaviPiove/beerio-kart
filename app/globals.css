@@ -44,6 +44,13 @@ body {
   font-weight: 500;
   min-height: 100vh;
   overflow-x: hidden;
+  /* Respect the iOS notch / translucent status bar when launched as a PWA
+     (Add to Home Screen). Horizontal insets keep content out of the rounded
+     corners on landscape. */
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 ::selection { background: var(--banana); color: #3a1800; }

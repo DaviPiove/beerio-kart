@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b1020;
+  --foreground: #fff8e7;
+  --mk-red: #e60012;
+  --mk-yellow: #ffcc00;
+  --mk-blue: #0097e6;
+  --mk-green: #3ecf4a;
+  --beer: #f6b93b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-mk-red: var(--mk-red);
+  --color-mk-yellow: var(--mk-yellow);
+  --color-mk-blue: var(--mk-blue);
+  --color-mk-green: var(--mk-green);
+  --color-beer: var(--beer);
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(ellipse at top left, #1a2450 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, #2b0a3e 0%, transparent 55%),
+    var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  min-height: 100vh;
 }
+
+.mk-title {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #ffcc00 0%, #ff6a00 50%, #e60012 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 4px 20px rgba(255, 204, 0, 0.25);
+}
+
+.mk-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+.mk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: transform 0.08s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+}
+.mk-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
+.mk-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.mk-btn-primary {
+  background: linear-gradient(180deg, #ffcc00, #ff8c00);
+  color: #4a1600;
+}
+.mk-btn-primary:hover:not(:disabled) { filter: brightness(1.05); }
+
+.mk-btn-danger {
+  background: linear-gradient(180deg, #ff5472, #e60012);
+  color: #fff;
+}
+
+.mk-btn-ghost {
+  background: rgba(255,255,255,0.08);
+  color: var(--foreground);
+}
+.mk-btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.14); }
+
+.mk-input {
+  background: rgba(0,0,0,0.3);
+  border: 2px solid rgba(255, 204, 0, 0.3);
+  border-radius: 999px;
+  padding: 0.75rem 1.25rem;
+  color: var(--foreground);
+  font-weight: 600;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.mk-input:focus { border-color: var(--mk-yellow); }
+
+.pos-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 1rem;
+}
+.pos-1 { background: #ffcc00; color: #4a1600; }
+.pos-2 { background: #c0c0c0; color: #1a1a1a; }
+.pos-3 { background: #cd7f32; color: #1a1a1a; }
+.pos-4 { background: #555; color: #fff; }

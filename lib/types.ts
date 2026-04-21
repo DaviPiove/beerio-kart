@@ -1,7 +1,10 @@
+import type { TournamentFormat } from "./bracket";
+
 export type Tournament = {
   id: string;
   name: string;
   status: "lobby" | "active" | "finished";
+  format: TournamentFormat;
   current_round: number;
   winner_id: string | null;
   created_at: string;
@@ -13,6 +16,7 @@ export type Player = {
   name: string;
   eliminated: boolean;
   eliminated_round: number | null;
+  lives: number;
   created_at: string;
 };
 

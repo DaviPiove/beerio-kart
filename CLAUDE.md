@@ -27,24 +27,37 @@ Env vars (also set in Vercel for production + development): `NEXT_PUBLIC_SUPABAS
 
 ### Tournament logic is split in two
 
-1. **`lib/bracket.ts`** — pure functions, no DB deps. `planRound(players, round, rng?)` seeds a round into 4-player heats (top-2 advance), with `computeByes(n) = n % 4` giving the minimum byes when player count isn't a multiple of 4. When ≤4 players remain, a single final heat is returned with `isFinal: true`. Covered by `lib/bracket.test.ts`.
+1. **`lib/bracket.ts`** — pure, unit-testable format strategies (no DB deps). Covered by `lib/bracket.test.ts`.
 2. **`app/actions.ts`** — server actions that marry the pure logic to Supabase. The bracket's state lives entirely in the DB; these actions read it, call the pure planner, and write results back.
+
+### Tournament formats
+
+Three formats are supported, each auto-recommended based on player count via `recommendFormat(n)` but overridable by the host in the lobby (`FormatSelector` → `setTournamentFormat` action). The chosen format is persisted on `tournaments.format`.
+
+| Format | Default for | Round 1 shape | Advancement |
+|---|---|---|---|
+| `single_elim` | 2-4, 8+ | `planRound` — heats of 4, byes for `n % 4` remainder | Top 2 per heat advance; 3rd/4th eliminated immediately in `submitHeatResults` |
+| `group_stage` | 5-7 | `planGroupStage` — `ceil(n*2/4)` heats (everyone plays 2, a few play 3), no byes | After **all** heats done, `computeGroupStandings` ranks by points (4/3/2/1) with tiebreakers (#1sts, then #2nds, then seed order); top 4 seeded into a Grand Final heat, rest marked eliminated at round 1 |
+| `double_elim` | 8+ (alt to single_elim) | Same shape as single_elim (`planDoubleElimRound` is currently a thin wrapper around `planRound`) | `applyLifeDeductions` logic lives in `submitHeatResults` per-heat: 3rd/4th lose 1 life; when `players.lives` hits 0 the player is eliminated. `advanceDoubleElim` just checks who's still alive and builds the next round until ≤4 remain for the final. `players.lives` resets to `DEFAULT_LIVES` (2) on `startTournament` / `resetTournament` |
+
+If the host picks `group_stage` but the count leaves the 5-7 window by the time they hit start, `startTournament` auto-falls-back to `recommendFormat(n)`.
 
 ### The "bye heat" convention (important)
 
-When a round has players skipping to the next round (byes), the actions create a **fake heat with `heat_number = 999` and `status = 'done'`**, containing the bye players. This keeps the schema simple — no separate "pending promotions" column — but means any code that iterates heats must filter out `heat_number === 999` (see `bracket.tsx` and `maybeAdvanceRound` in `actions.ts`). The heat detail page redirects to `/t/[id]` if someone navigates directly to a bye heat.
+When a single-elim or double-elim round has players skipping to the next round (byes), the actions create a **fake heat with `heat_number = 999` and `status = 'done'`**, containing the bye players. This keeps the schema simple — no separate "pending promotions" column — but means any code that iterates heats must filter out `heat_number === 999` (see `bracket.tsx` and `maybeAdvanceRound` in `actions.ts`). The heat detail page redirects to `/t/[id]` if someone navigates directly to a bye heat. Group stage never produces byes.
 
 ### Round advancement
 
-`submitHeatResults` writes positions, marks the heat done, eliminates positions 3+, and calls `maybeAdvanceRound`. That function:
-- Verifies all race heats in the round are done.
-- Collects advancers (top 2 per race heat) + bye-heat players.
-- If only one race heat existed this round, treats it as the final and sets `tournaments.winner_id`.
-- Otherwise calls `planRound(advancers, round+1)` and inserts the next round's heats + heat_players + optional new bye heat.
+`submitHeatResults` writes positions, marks the heat done, applies **per-heat** side effects scoped to the active format (single_elim: eliminate 3rd/4th; double_elim: decrement lives and eliminate at 0; group_stage: nothing yet), and calls `maybeAdvanceRound`. That function:
+- Loads `tournaments.format` and verifies all race heats in the round are done.
+- Dispatches to `advanceSingleElim` / `advanceGroupStage` / `advanceDoubleElim`.
+- Each strategy either marks a winner on `tournaments.winner_id` or calls the shared `buildNextRound` which re-plans (via `planRound` for elim/final, `planDoubleElimRound` for 2-life), inserts heats + heat_players, and optionally a new bye heat.
 
 ### Schema
 
-`tournaments` → `players` / `heats` → `heat_players` (pivot with `finish_position` and `is_bye`). RLS is enabled on all four tables with **permissive "public all" policies** — intentional for the open tournament night. All four tables are added to `supabase_realtime` publication.
+`tournaments` (`format`, `current_round`, `winner_id`, …) → `players` (`eliminated`, `eliminated_round`, `lives`) / `heats` → `heat_players` (pivot with `finish_position` and `is_bye`). RLS is enabled on all four tables with **permissive "public all" policies** — intentional for the open tournament night. All four tables are added to `supabase_realtime` publication.
+
+`tournaments.format` is a text column with a CHECK constraint (`single_elim | group_stage | double_elim`). `players.lives` defaults to 2 and is only meaningful for `double_elim` runs; other formats leave it at the default.
 
 ### Realtime model
 

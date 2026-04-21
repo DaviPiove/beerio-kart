@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Heat, HeatPlayer, Player } from "@/lib/types";
+import type { TournamentFormat } from "@/lib/bracket";
 import { Beer, CheckerFlag, Trophy } from "@/components/assets";
 
 export function Bracket({
@@ -7,11 +8,13 @@ export function Bracket({
   heats,
   heatPlayers,
   players,
+  format,
 }: {
   tournamentId: string;
   heats: Heat[];
   heatPlayers: HeatPlayer[];
   players: Player[];
+  format: TournamentFormat;
 }) {
   const byRound = new Map<number, Heat[]>();
   for (const h of heats) {
@@ -42,6 +45,13 @@ export function Bracket({
                 .map((hp) => hp.player_id)
             : [];
           const isFinal = raceHeats.length === 1;
+          const isGroupStageRound =
+            format === "group_stage" && round === 1 && !isFinal;
+          const label = isFinal
+            ? "Grand Final"
+            : isGroupStageRound
+            ? "Group Stage"
+            : `Round ${round}`;
           return (
             <div
               key={round}
@@ -50,7 +60,7 @@ export function Bracket({
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="font-pixel text-[11px] px-2.5 py-1.5 rounded-full border-2 border-[#1a0030] bg-sky text-[#002a4a] shadow-[0_3px_0_#1a0030]">
-                  R{round}
+                  {isGroupStageRound ? "GS" : `R${round}`}
                 </div>
                 <h3 className="font-display uppercase text-lg sm:text-xl">
                   {isFinal ? (
@@ -59,7 +69,7 @@ export function Bracket({
                       Grand Final
                     </span>
                   ) : (
-                    `Round ${round}`
+                    label
                   )}
                 </h3>
               </div>

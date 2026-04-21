@@ -5,12 +5,14 @@ import type { Heat, HeatPlayer, Player, Tournament } from "@/lib/types";
 import { JoinForm } from "./join-form";
 import { LobbyActions } from "./lobby-actions";
 import { Bracket } from "./bracket";
+import { FormatSelector } from "./format-selector";
 import { Leaderboard } from "./leaderboard";
 import { RealtimeRefresher } from "./realtime";
 import { ResetButton } from "./reset-button";
 import { WinnerCelebration } from "./winner-celebration";
 import { DeleteTournamentButton } from "@/components/delete-tournament-button";
 import { Kart, Mushroom } from "@/components/assets";
+import { formatLabel } from "@/lib/bracket";
 
 export const dynamic = "force-dynamic";
 
@@ -89,6 +91,9 @@ export default async function TournamentPage({
                 🏆 {winner.name} wins!
               </span>
             )}
+            <span className="tag bg-[#1a0030] text-white/80 border border-white/20">
+              🎮 {formatLabel(t.format)}
+            </span>
           </div>
         </div>
         <DeleteTournamentButton
@@ -144,6 +149,11 @@ export default async function TournamentPage({
               )}
             </ul>
           </section>
+          <FormatSelector
+            tournamentId={t.id}
+            currentFormat={t.format}
+            playerCount={ps.length}
+          />
           <div className="anim-pop anim-pop-2">
             <LobbyActions tournamentId={t.id} playerCount={ps.length} />
           </div>
@@ -157,12 +167,19 @@ export default async function TournamentPage({
             heats={hs}
             heatPlayers={hps}
             players={ps}
+            format={t.format}
           />
         </div>
       )}
 
       <div className="anim-pop anim-pop-2">
-        <Leaderboard players={ps} winnerId={t.winner_id} />
+        <Leaderboard
+          players={ps}
+          winnerId={t.winner_id}
+          format={t.format}
+          heats={hs}
+          heatPlayers={hps}
+        />
       </div>
 
       {t.status !== "lobby" && <ResetButton tournamentId={t.id} />}

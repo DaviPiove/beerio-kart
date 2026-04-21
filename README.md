@@ -2,6 +2,8 @@
 
 Mario Kart tournament app with a beer twist: finish one full beer within 3 laps, and **no joystick while drinking**.
 
+🔗 **Live:** https://beerio-kart-vert.vercel.app
+
 ## Format
 
 - Single elimination, 4-player heats.

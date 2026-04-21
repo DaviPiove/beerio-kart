@@ -64,7 +64,7 @@ export default async function TournamentPage({
         <WinnerCelebration key={winner.id} />
       )}
 
-      <header className="flex items-start justify-between gap-4 anim-pop">
+      <header className="flex items-start justify-between gap-3 anim-pop">
         <div className="flex-1 min-w-0">
           <Link
             href="/"
@@ -72,10 +72,10 @@ export default async function TournamentPage({
           >
             ← HOME
           </Link>
-          <h1 className="headline-sm text-3xl sm:text-5xl mt-2 break-words">
+          <h1 className="headline-sm text-2xl sm:text-5xl mt-2 break-words">
             {t.name}
           </h1>
-          <div className="flex flex-wrap items-center gap-2 mt-3">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3">
             {t.status === "lobby" && (
               <span className="tag bg-luigi text-[#0a2e17]">
                 🕹 Lobby · {ps.length} {ps.length === 1 ? "racer" : "racers"}
@@ -87,8 +87,8 @@ export default async function TournamentPage({
               </span>
             )}
             {t.status === "finished" && winner && (
-              <span className="tag bg-banana text-[#3a1600]">
-                🏆 {winner.name} wins!
+              <span className="tag bg-banana text-[#3a1600] max-w-full">
+                <span className="truncate">🏆 {winner.name} wins!</span>
               </span>
             )}
             <span className="tag bg-[#1a0030] text-white/80 border border-white/20">
@@ -104,17 +104,20 @@ export default async function TournamentPage({
 
       {t.status === "finished" && winner && (
         <section className="card-sticker bg-gradient-to-b from-banana to-shell text-center p-6 sm:p-10 anim-pop anim-pop-1 relative overflow-hidden">
-          <div className="absolute -left-6 top-6 w-20 opacity-80 -rotate-12" aria-hidden>
+          <div className="absolute -left-4 sm:-left-6 top-4 sm:top-6 w-14 sm:w-20 opacity-80 -rotate-12 pointer-events-none" aria-hidden>
             <Mushroom />
           </div>
-          <div className="absolute -right-4 bottom-2 w-20 opacity-80 rotate-12" aria-hidden>
+          <div className="absolute -right-3 sm:-right-4 bottom-2 w-14 sm:w-20 opacity-80 rotate-12 pointer-events-none" aria-hidden>
             <Kart />
           </div>
-          <div className="text-6xl mb-2">🏆🍺</div>
-          <div className="font-display uppercase text-4xl sm:text-5xl text-[#3a1600]" style={{ WebkitTextStroke: "2px #fff" }}>
+          <div className="text-5xl sm:text-6xl mb-2">🏆🍺</div>
+          <div
+            className="font-display uppercase text-3xl sm:text-5xl text-[#3a1600] break-words px-2"
+            style={{ WebkitTextStroke: "2px #fff" }}
+          >
             {winner.name}
           </div>
-          <p className="text-[#3a1600]/90 mt-3 font-bold">
+          <p className="text-[#3a1600]/90 mt-3 font-bold text-sm sm:text-base">
             drank the beers and won it all.
           </p>
         </section>
@@ -122,7 +125,7 @@ export default async function TournamentPage({
 
       {t.status === "lobby" && (
         <>
-          <section className="card p-6 sm:p-8 anim-pop anim-pop-1">
+          <section className="card p-5 sm:p-8 anim-pop anim-pop-1">
             <h2 className="font-display uppercase text-xl sm:text-2xl mb-1 text-banana">
               🎮 Join the race
             </h2>

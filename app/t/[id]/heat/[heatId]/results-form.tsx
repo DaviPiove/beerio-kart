@@ -152,16 +152,19 @@ export function HeatResultsForm({
       )}
 
       {!locked && (
-        <div className="flex gap-3 sticky bottom-3">
+        <div
+          className="flex gap-2 sm:gap-3 sticky bottom-2 sm:bottom-3"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
           <button
-            className="btn btn-ghost flex-1"
+            className="btn btn-ghost flex-1 min-w-0"
             onClick={reset}
             disabled={pending || assigned.length === 0}
           >
             Clear
           </button>
           <button
-            className="btn btn-primary flex-[2] btn-wiggle"
+            className="btn btn-primary flex-[2] min-w-0 btn-wiggle"
             onClick={submit}
             disabled={!canSubmit || pending}
           >

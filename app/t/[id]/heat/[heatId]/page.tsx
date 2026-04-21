@@ -45,7 +45,7 @@ export default async function HeatPage({
     .filter((r) => r.player);
 
   return (
-    <main className="mx-auto w-full max-w-xl px-4 py-6 sm:py-8 flex-1 flex flex-col gap-6">
+    <main className="mx-auto w-full max-w-xl px-4 py-6 sm:py-8 flex-1 flex flex-col gap-5 sm:gap-6">
       <Link
         href={`/t/${id}`}
         className="inline-flex items-center gap-2 text-xs font-pixel text-white/70 hover:text-banana transition"
@@ -55,12 +55,12 @@ export default async function HeatPage({
 
       <header className="relative anim-pop">
         <div
-          className="absolute -top-4 -right-2 w-16 anim-bob opacity-80"
+          className="absolute -top-3 sm:-top-4 -right-1 sm:-right-2 w-12 sm:w-16 anim-bob opacity-80 pointer-events-none"
           aria-hidden
         >
           <CheckerFlag />
         </div>
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 pr-12">
           <span className="font-pixel text-[10px] px-2.5 py-1.5 rounded-full border-2 border-[#1a0030] bg-sky text-[#002a4a] shadow-[0_3px_0_#1a0030]">
             ROUND {h.round}
           </span>
@@ -68,11 +68,11 @@ export default async function HeatPage({
             HEAT {h.heat_number}
           </span>
         </div>
-        <h1 className="headline-sm text-3xl sm:text-4xl">
+        <h1 className="headline-sm text-2xl sm:text-4xl">
           {h.status === "done" ? "Results" : "Tap the finish order"}
         </h1>
         {h.status !== "done" && (
-          <p className="text-white/70 mt-2 flex items-start gap-2">
+          <p className="text-white/70 mt-2 flex items-start gap-2 text-sm sm:text-base">
             <span className="w-5 h-5 shrink-0 mt-0.5"><Beer /></span>
             Chug within 3 laps. No joystick while drinking. 1st → last.
           </p>

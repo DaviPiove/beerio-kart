@@ -59,14 +59,14 @@ export function FormatSelector({
   };
 
   return (
-    <section className="card p-6 sm:p-8 anim-pop anim-pop-1">
+    <section className="card p-5 sm:p-8 anim-pop anim-pop-1 overflow-visible">
       <h2 className="font-display uppercase text-xl sm:text-2xl mb-1 text-peach">
         🏆 Pick the format
       </h2>
       <p className="text-white/60 text-sm mb-5">
         Auto-picked for your player count. Host can swap it before launch.
       </p>
-      <div className="grid sm:grid-cols-3 gap-3">
+      <div className="grid sm:grid-cols-3 gap-3 pt-2 sm:pt-0">
         {OPTIONS.map((opt) => {
           const selected = opt.id === currentFormat;
           const isRecommended = opt.id === recommended;
@@ -87,13 +87,15 @@ export function FormatSelector({
               aria-pressed={selected}
             >
               {isRecommended && (
-                <span className="absolute -top-2 -right-2 font-pixel text-[9px] px-2 py-1 rounded-full bg-luigi text-[#0a2e17] border-2 border-[#1a0030] shadow-[0_2px_0_#1a0030]">
+                <span className="absolute -top-2 right-2 sm:-right-2 font-pixel text-[9px] px-2 py-1 rounded-full bg-luigi text-[#0a2e17] border-2 border-[#1a0030] shadow-[0_2px_0_#1a0030] whitespace-nowrap">
                   ★ PICKED
                 </span>
               )}
-              <div className="text-2xl mb-1">{opt.emoji}</div>
-              <div className="font-display uppercase text-base leading-tight mb-0.5">
-                {formatLabel(opt.id)}
+              <div className="flex items-center gap-2 mb-1 sm:block">
+                <div className="text-2xl">{opt.emoji}</div>
+                <div className="font-display uppercase text-base leading-tight sm:mb-0.5">
+                  {formatLabel(opt.id)}
+                </div>
               </div>
               <div
                 className={`font-pixel text-[10px] mb-2 ${

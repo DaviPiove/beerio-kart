@@ -25,11 +25,11 @@ export function Bracket({
   const rounds = Array.from(byRound.keys()).sort((a, b) => a - b);
 
   return (
-    <section className="card p-5 sm:p-7 relative overflow-hidden">
-      <div className="absolute -top-4 -right-4 w-20 opacity-80 anim-spin-slow" aria-hidden>
+    <section className="card p-4 sm:p-7 relative overflow-hidden">
+      <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-14 sm:w-20 opacity-80 anim-spin-slow pointer-events-none" aria-hidden>
         <CheckerFlag />
       </div>
-      <h2 className="font-display uppercase text-xl sm:text-2xl mb-5 flex items-center gap-3">
+      <h2 className="font-display uppercase text-xl sm:text-2xl mb-5 flex items-center gap-3 pr-12 sm:pr-0">
         🏁 Bracket
       </h2>
       <div className="flex flex-col gap-8">
@@ -73,7 +73,7 @@ export function Bracket({
                   )}
                 </h3>
               </div>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                 {raceHeats.map((h, hi) => {
                   const hps = heatPlayers
                     .filter((hp) => hp.heat_id === h.id)

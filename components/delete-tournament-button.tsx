@@ -49,9 +49,9 @@ export function DeleteTournamentButton({
       onClick={onClick}
       disabled={pending}
       aria-label={`Delete ${tournamentName}`}
-      className="w-9 h-9 rounded-full bg-black/40 hover:bg-mario hover:scale-110 transition border-2 border-[#1a0030] grid place-items-center shrink-0"
+      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-mario hover:scale-110 transition border-2 border-[#1a0030] grid place-items-center shrink-0 self-center"
     >
-      <span className="text-base">🗑</span>
+      <span className="text-sm sm:text-base">🗑</span>
     </button>
   );
 }

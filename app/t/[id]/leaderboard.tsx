@@ -32,18 +32,18 @@ export function Leaderboard({
       : null;
 
   return (
-    <section className="card p-5 sm:p-7">
-      <h2 className="font-display uppercase text-xl sm:text-2xl mb-5 flex items-center gap-3">
+    <section className="card p-4 sm:p-7">
+      <h2 className="font-display uppercase text-xl sm:text-2xl mb-4 sm:mb-5 flex items-center gap-3">
         📊 Leaderboard
       </h2>
       <ul className="flex flex-col gap-2">
         {winner && (
-          <li className="flex items-center gap-3 py-2.5 px-4 rounded-2xl bg-gradient-to-r from-banana to-shell border-2 border-[#1a0030] shadow-[0_4px_0_#1a0030]">
-            <span className="text-2xl">🏆</span>
-            <span className="font-display uppercase text-[#3a1600] flex-1">
+          <li className="flex items-center gap-3 py-2.5 px-3 sm:px-4 rounded-2xl bg-gradient-to-r from-banana to-shell border-2 border-[#1a0030] shadow-[0_4px_0_#1a0030] min-w-0">
+            <span className="text-2xl shrink-0">🏆</span>
+            <span className="font-display uppercase text-[#3a1600] flex-1 min-w-0 truncate">
               {winner.name}
             </span>
-            <span className="font-pixel text-[10px] text-[#3a1600]/80">
+            <span className="font-pixel text-[10px] text-[#3a1600]/80 shrink-0">
               WINNER
             </span>
           </li>
@@ -51,13 +51,15 @@ export function Leaderboard({
         {alive.map((p) => (
           <li
             key={p.id}
-            className="flex items-center gap-3 py-2 px-4 rounded-xl bg-white/5 border border-white/10"
+            className="flex items-center gap-2 sm:gap-3 py-2 px-3 sm:px-4 rounded-xl bg-white/5 border border-white/10 min-w-0"
           >
-            <span>🏎️</span>
-            <span className="font-semibold flex-1">{p.name}</span>
+            <span className="shrink-0">🏎️</span>
+            <span className="font-semibold flex-1 min-w-0 truncate">
+              {p.name}
+            </span>
             {format === "double_elim" && (
               <span
-                className="font-pixel text-[10px] text-banana"
+                className="font-pixel text-[10px] text-banana shrink-0"
                 title="Lives remaining"
               >
                 {"❤️".repeat(Math.max(0, p.lives ?? 0))}
@@ -65,11 +67,11 @@ export function Leaderboard({
               </span>
             )}
             {format === "group_stage" && standingsById && (
-              <span className="font-pixel text-[10px] text-banana">
+              <span className="font-pixel text-[10px] text-banana shrink-0">
                 {standingsById.get(p.id) ?? 0} PTS
               </span>
             )}
-            <span className="tag bg-luigi text-[#0a2e17] text-[10px]">
+            <span className="tag bg-luigi text-[#0a2e17] text-[10px] shrink-0">
               Alive
             </span>
           </li>
@@ -77,16 +79,18 @@ export function Leaderboard({
         {eliminated.map((p) => (
           <li
             key={p.id}
-            className="flex items-center gap-3 py-2 px-4 rounded-xl opacity-55"
+            className="flex items-center gap-2 sm:gap-3 py-2 px-3 sm:px-4 rounded-xl opacity-55 min-w-0"
           >
-            <span>💀</span>
-            <span className="line-through flex-1">{p.name}</span>
+            <span className="shrink-0">💀</span>
+            <span className="line-through flex-1 min-w-0 truncate">
+              {p.name}
+            </span>
             {format === "group_stage" && standingsById && (
-              <span className="font-pixel text-[10px] text-white/60">
+              <span className="font-pixel text-[10px] text-white/60 shrink-0">
                 {standingsById.get(p.id) ?? 0} PTS
               </span>
             )}
-            <span className="font-pixel text-[10px] text-white/60">
+            <span className="font-pixel text-[10px] text-white/60 shrink-0">
               OUT R{p.eliminated_round}
             </span>
           </li>

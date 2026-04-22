@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { submitHeatResults } from "@/app/actions";
+import { submitHeatResults, unlockHeatResults } from "@/app/actions";
 
 type Racer = {
   playerId: string;
@@ -70,6 +70,23 @@ export function HeatResultsForm({
         router.push(`/t/${tournamentId}`);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to submit");
+      }
+    });
+  }
+
+  function unlock() {
+    if (!locked) return;
+    const ok = window.confirm(
+      "Unlock this heat?\n\nThis will clear the results. If the tournament already advanced to a later round or finished, that progress will be rolled back.",
+    );
+    if (!ok) return;
+    setError(null);
+    startTransition(async () => {
+      try {
+        await unlockHeatResults(heatId);
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to unlock");
       }
     });
   }
@@ -170,6 +187,24 @@ export function HeatResultsForm({
           >
             {pending ? "Locking…" : "✅ Lock in results"}
           </button>
+        </div>
+      )}
+
+      {locked && (
+        <div
+          className="flex flex-col gap-2 sticky bottom-2 sm:bottom-3"
+          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
+          <button
+            className="btn btn-ghost w-full"
+            onClick={unlock}
+            disabled={pending}
+          >
+            {pending ? "Unlocking…" : "↩️ Unlock results"}
+          </button>
+          <p className="text-white/50 text-[11px] text-center px-2">
+            Undoes this heat. Any later rounds or the winner will be rolled back.
+          </p>
         </div>
       )}
     </div>

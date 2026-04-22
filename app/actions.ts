@@ -568,6 +568,108 @@ async function buildNextRound(
     .eq("id", tournamentId);
 }
 
+export async function unlockHeatResults(heatId: string) {
+  const supabase = await createClient();
+
+  const { data: heat, error: hErr } = await supabase
+    .from("heats")
+    .select("id, tournament_id, round, heat_number, status")
+    .eq("id", heatId)
+    .single();
+  if (hErr) throw hErr;
+  if (heat.heat_number === 999) {
+    throw new Error("Cannot unlock a bye heat.");
+  }
+  if (heat.status !== "done") {
+    throw new Error("Heat is not locked.");
+  }
+
+  const tournamentId = heat.tournament_id;
+
+  // 1. Nuke any later-round heats (cascades to heat_players).
+  await supabase
+    .from("heats")
+    .delete()
+    .eq("tournament_id", tournamentId)
+    .gt("round", heat.round);
+
+  // 2. Un-eliminate anyone whose elimination came from this round or later.
+  await supabase
+    .from("players")
+    .update({ eliminated: false, eliminated_round: null })
+    .eq("tournament_id", tournamentId)
+    .gte("eliminated_round", heat.round);
+
+  // 3. Clear this heat's positions and re-open it.
+  await supabase
+    .from("heat_players")
+    .update({ finish_position: null })
+    .eq("heat_id", heatId);
+  await supabase
+    .from("heats")
+    .update({ status: "pending" })
+    .eq("id", heatId);
+
+  // 4. For double_elim, recompute lives from scratch. A player's lives =
+  //    DEFAULT_LIVES - (# bottom-2 finishes in heats that are still "done").
+  //    Any deductions from the unlocked heat and the deleted later rounds
+  //    are now gone, so this cleanly restores the correct life count.
+  const { data: tournament } = await supabase
+    .from("tournaments")
+    .select("format")
+    .eq("id", tournamentId)
+    .single();
+
+  if (tournament?.format === "double_elim") {
+    const { data: doneHeats } = await supabase
+      .from("heats")
+      .select("id")
+      .eq("tournament_id", tournamentId)
+      .eq("status", "done")
+      .neq("heat_number", 999);
+    const doneHeatIds = (doneHeats ?? []).map((h) => h.id);
+
+    const deductions = new Map<string, number>();
+    if (doneHeatIds.length > 0) {
+      const { data: hps } = await supabase
+        .from("heat_players")
+        .select("player_id, finish_position")
+        .in("heat_id", doneHeatIds);
+      for (const hp of hps ?? []) {
+        if (hp.finish_position != null && hp.finish_position >= 3) {
+          deductions.set(hp.player_id, (deductions.get(hp.player_id) ?? 0) + 1);
+        }
+      }
+    }
+
+    const { data: players } = await supabase
+      .from("players")
+      .select("id")
+      .eq("tournament_id", tournamentId);
+
+    for (const p of players ?? []) {
+      const newLives = Math.max(0, DEFAULT_LIVES - (deductions.get(p.id) ?? 0));
+      await supabase
+        .from("players")
+        .update({ lives: newLives })
+        .eq("id", p.id);
+    }
+  }
+
+  // 5. Reset tournament to active state, pointing back at this heat's round.
+  await supabase
+    .from("tournaments")
+    .update({
+      status: "active",
+      winner_id: null,
+      current_round: heat.round,
+    })
+    .eq("id", tournamentId);
+
+  revalidatePath(`/t/${tournamentId}`);
+  revalidatePath(`/t/${tournamentId}/heat/${heatId}`);
+}
+
 export async function deleteTournament(tournamentId: string) {
   const supabase = await createClient();
   const { error } = await supabase
